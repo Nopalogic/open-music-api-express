@@ -1,8 +1,9 @@
+import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 
 import { Exception } from "../exceptions/error-handler.js";
 
-import { generateAccessToken, verifyToken } from "../utils/token-manager.js";
+import { generateAccessToken } from "../utils/token-manager.js";
 
 import { AuthSchema } from "../validations/auth.js";
 import { validate } from "../validations/index.js";
@@ -33,7 +34,7 @@ export class AuthService {
 
     if (!rowCount) throw new Exception(400, "Invalid refresh token");
 
-    const { id, username, fullname } = await verifyToken(refreshToken);
+    const { id, username, fullname } = await this.JwtVerifyToken(refreshToken);
 
     return { accessToken: generateAccessToken({ id, username, fullname }) };
   }
@@ -51,5 +52,16 @@ export class AuthService {
     if (!rowCount) {
       throw new Exception(400, "Invalid token");
     }
+  }
+
+  static JwtVerifyToken(token) {
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, process.env.REFRESH_TOKEN_KEY, (err, decoded) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(decoded);
+      });
+    });
   }
 }

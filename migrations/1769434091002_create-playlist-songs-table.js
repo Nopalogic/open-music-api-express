@@ -23,7 +23,6 @@ export const up = (pgm) => {
     song_id: {
       type: "TEXT",
       notNull: true,
-      unique: true,
       references: '"songs"',
       onDelete: "CASCADE",
     },
@@ -37,6 +36,10 @@ export const up = (pgm) => {
       notNull: true,
       default: pgm.func("current_timestamp"),
     },
+  });
+
+  pgm.addConstraint("playlist_songs", "unique_playlist_song", {
+    unique: ["playlist_id", "song_id"],
   });
 };
 

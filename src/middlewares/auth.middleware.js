@@ -5,7 +5,7 @@ export const authMiddleware = async (req, res, next) => {
   const token = authorization && authorization.split(" ").pop();
 
   if (!token) {
-    res.status(401).json({
+    return res.status(401).json({
       status: "fail",
       message: "Unauthenticated",
     });
@@ -15,7 +15,7 @@ export const authMiddleware = async (req, res, next) => {
   const user = { id, username, fullname };
 
   if (!user) {
-    res.status(403).json({
+    return res.status(403).json({
       status: "fail",
       messege: "Unauthorized",
     });

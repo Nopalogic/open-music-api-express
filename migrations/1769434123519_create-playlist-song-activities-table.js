@@ -23,10 +23,14 @@ export const up = (pgm) => {
     song_id: {
       type: "TEXT",
       notNull: true,
+      references: '"songs"',
+      onDelete: "CASCADE",
     },
     user_id: {
       type: "TEXT",
       notNull: true,
+      references: '"users"',
+      onDelete: "CASCADE",
     },
     action: {
       type: "TEXT",

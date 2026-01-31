@@ -17,14 +17,12 @@ export const up = (pgm) => {
     playlist_id: {
       type: "TEXT",
       notNull: true,
-      unique: true,
       references: '"playlists"',
       onDelete: "CASCADE",
     },
     user_id: {
       type: "TEXT",
       notNull: true,
-      unique: true,
       references: '"users"',
       onDelete: "CASCADE",
     },
@@ -38,6 +36,10 @@ export const up = (pgm) => {
       notNull: true,
       default: pgm.func("current_timestamp"),
     },
+  });
+
+  pgm.addConstraint("collaborations", "unique_collaboration", {
+    unique: ["playlist_id", "user_id"],
   });
 };
 

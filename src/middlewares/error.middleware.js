@@ -7,13 +7,13 @@ export const errorMiddleware = (err, req, res, next) => {
   }
 
   if (err instanceof Exception) {
-    res.status(err.status).json({
+    return res.status(err.status).json({
       status: "fail",
       message: err.message,
     });
   }
 
-  res.status(500).json({
+  return res.status(500).json({
     errors: err.message,
   });
 };
