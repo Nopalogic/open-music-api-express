@@ -1,20 +1,24 @@
 import { nanoid } from "nanoid";
 import { Pool } from "pg";
 
-import { Exception } from "../exceptions/error-handler.js";
-import { validate } from "../validations/index.js";
-import { PlaylistSchema } from "../validations/playlist.js";
+import { Exception } from "../../exceptions/error-handler.js";
+
+import { validate } from "../../utils/validation.js";
+
+import { PlaylistSchema } from "./playlist.schema.js";
 
 export class PlaylistService {
-  static pool = new Pool();
+  constructor() {
+    this.pool = new Pool();
+  }
 
-  static async createPlaylist(request) {
-    const validatedRequest = validate(PlaylistSchema.create, request);
+  async createPlaylist(request) {
+    const { name, owner } = validate(PlaylistSchema.create, request);
 
     const id = nanoid(16);
     const query = {
       text: "INSERT INTO playlists VALUES($1, $2, $3) RETURNING id",
-      values: [id, validatedRequest.name, validatedRequest.owner],
+      values: [id, name, owner],
     };
 
     const { rows, rowCount } = await this.pool.query(query);
@@ -26,10 +30,8 @@ export class PlaylistService {
     return { playlistId: rows[0].id };
   }
 
-  static async getPlaylists(id) {
-    const { playlistId } = validate(PlaylistSchema.get, {
-      playlistId: id,
-    });
+  async getPlaylists(request) {
+    const { playlistId } = validate(PlaylistSchema.get, request);
 
     const query = {
       text: `
@@ -53,7 +55,7 @@ export class PlaylistService {
     return { playlists: rows };
   }
 
-  static async addSongToPlaylist(request) {
+  async addSongToPlaylist(request) {
     const { playlistId, songId, userId } = validate(
       PlaylistSchema.addSong,
       request,
@@ -96,7 +98,7 @@ export class PlaylistService {
     }
   }
 
-  static async getSongByIdPlaylist(playlistId, userId) {
+  async getSongByIdPlaylist(playlistId, userId) {
     await this.verifyPlaylistAccess(playlistId, userId);
 
     const query = {
@@ -135,7 +137,7 @@ export class PlaylistService {
     };
   }
 
-  static async deleteSongByIdPlaylist(request) {
+  async deleteSongByIdPlaylist(request) {
     const { songId, playlistId, userId } = validate(
       PlaylistSchema.removeSong,
       request,
@@ -154,7 +156,7 @@ export class PlaylistService {
       throw new Exception(400, "No song was deleted from the playlist");
   }
 
-  static async deletePlaylist(request) {
+  async deletePlaylist(request) {
     const { playlistId, userId } = validate(PlaylistSchema.get, request);
 
     const { rowCount: playlistExist, rows: playlist } = await this.pool.query({
@@ -188,18 +190,12 @@ export class PlaylistService {
     }
   }
 
-  static async verifyPlaylistAccess(playlistId, userId) {
+  async verifyPlaylistAccess(playlistId, userId) {
     try {
-      const { rowCount: playlistExist, rows: playlist } = await this.pool.query(
-        {
-          text: "SELECT owner FROM playlists WHERE id = $1",
-          values: [playlistId],
-        },
-      );
-
-      if (!playlistExist) {
-        throw new Exception(404, `Playlist with ID ${playlistId} not found`);
-      }
+      const { rows: playlist } = await this.pool.query({
+        text: "SELECT owner FROM playlists WHERE id = $1",
+        values: [playlistId],
+      });
 
       if (playlist[0].owner !== userId) {
         throw new Exception(

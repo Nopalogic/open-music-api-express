@@ -1,37 +1,39 @@
+import { nanoid } from "nanoid";
 import { Pool } from "pg";
 
-import { AlbumsSchema } from "../validations/album.js";
-import { validate } from "../validations/index.js";
+import { Exception } from "../../exceptions/error-handler.js";
 
-import { Exception } from "../exceptions/error-handler.js";
-import { mapDBtoAlbumModel } from "../utils/index.js";
-import { nanoid } from "nanoid";
+import { mapDBtoAlbumModel } from "../../utils/index.js";
+import { validate } from "../../utils/validation.js";
+
+import { AlbumSchema } from "./album.schema.js";
 
 export class AlbumService {
-  static pool = new Pool();
-  static tableName = "albums";
+  constructor() {
+    this.pool = new Pool();
+  }
 
-  static async create(request) {
-    const validatedRequest = validate(AlbumsSchema, request);
+  async createAlbum(request) {
+    const { name, year } = validate(AlbumSchema, request);
 
     const id = nanoid(16);
     const query = {
-      text: `INSERT INTO ${this.tableName} (id, name, year) VALUES($1, $2, $3) RETURNING id`,
-      values: [id, validatedRequest.name, validatedRequest.year],
+      text: "INSERT INTO albums (id, name, year) VALUES($1, $2, $3) RETURNING id",
+      values: [id, name, year],
     };
 
-    const { rows } = await this.pool.query(query);
+    const { rows, rowCount } = await this.pool.query(query);
 
-    if (!rows[0].id) {
+    if (!rowCount) {
       throw new Exception(400, "Album gagal ditambahkan");
     }
 
     return rows[0].id;
   }
 
-  static async findOne(id) {
+  async findAlbum(id) {
     const query = {
-      text: `SELECT * FROM ${this.tableName} WHERE id = $1`,
+      text: "SELECT * FROM albums WHERE id = $1",
       values: [id],
     };
     const { rowCount, rows } = await this.pool.query(query);
@@ -47,6 +49,7 @@ export class AlbumService {
     };
 
     const { rows: songResult } = await this.pool.query(songQuery);
+
     const songs = songResult.map((song) => ({
       id: song.id,
       title: song.title,
@@ -63,13 +66,13 @@ export class AlbumService {
     return mapDBtoAlbumModel(resultAlbum);
   }
 
-  static async update(id, request) {
-    const validatedRequest = validate(AlbumsSchema, request);
+  async updateAlbum({ id, ...request }) {
+    const { name, year } = validate(AlbumSchema, request);
 
     const updatedAt = new Date().toISOString();
     const query = {
-      text: `UPDATE ${this.tableName} SET name = $1, year = $2, updated_at = $3 WHERE id = $4 RETURNING id`,
-      values: [validatedRequest.name, validatedRequest.year, updatedAt, id],
+      text: "UPDATE albums SET name = $1, year = $2, updated_at = $3 WHERE id = $4 RETURNING id",
+      values: [name, year, updatedAt, id],
     };
 
     const { rowCount } = await this.pool.query(query);
@@ -79,9 +82,9 @@ export class AlbumService {
     }
   }
 
-  static async delete(id) {
+  async deleteAlbum(id) {
     const query = {
-      text: `DELETE FROM ${this.tableName} WHERE id = $1 RETURNING id`,
+      text: "DELETE FROM albums WHERE id = $1 RETURNING id",
       values: [id],
     };
 
@@ -90,5 +93,19 @@ export class AlbumService {
     if (!rowCount) {
       throw new Exception(404, "Gagal menghapus album. Id tidak ditemukan");
     }
+  }
+
+  async updateCoverAlbum({ id, coverUrl }) {
+    const query = {
+      text: "UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id, cover",
+      values: [coverUrl, id],
+    };
+    const { rowCount, rows } = await this.pool.query(query);
+
+    if (!rowCount) {
+      throw new Exception(400, "Album not found");
+    }
+
+    return rows[0];
   }
 }

@@ -1,9 +1,13 @@
 import { UserService } from "../services/user.service.js";
 
 export class UserController {
-  static async register(req, res, next) {
+  constructor() {
+    this.userService = new UserService();
+  }
+
+  async register(req, res, next) {
     try {
-      const response = await UserService.register(req.body);
+      const response = await this.userService.register(req.body);
 
       res.status(201).json({
         status: "success",
@@ -14,9 +18,9 @@ export class UserController {
     }
   }
 
-  static async login(req, res, next) {
+  async login(req, res, next) {
     try {
-      const response = await UserService.login(req.body);
+      const response = await this.userService.login(req.body);
 
       res.status(201).json({
         status: "success",

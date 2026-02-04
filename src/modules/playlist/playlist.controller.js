@@ -1,5 +1,5 @@
 import { PlaylistService } from "../services/playlist.service.js";
-import { ActivityService } from "../services/activity.service.js";
+import { ActivityService } from "../../services/activity.service.js";
 
 export class PlaylistController {
   static async create(req, res, next) {
@@ -17,8 +17,10 @@ export class PlaylistController {
   }
 
   static async getAll(req, res, next) {
+    const { id: playlistId } = req.params;
+
     try {
-      const response = await PlaylistService.getPlaylists(req.user.id);
+      const response = await PlaylistService.getPlaylists({ playlistId });
 
       res.status(200).json({
         status: "success",

@@ -1,9 +1,13 @@
 import { SongService } from "../services/song.service.js";
 
 export class SongController {
-  static async create(req, res, next) {
+  constructor() {
+    this.songService = new SongService();
+  }
+
+  async create(req, res, next) {
     try {
-      const response = await SongService.create(req.body);
+      const response = await this.songService.createSong(req.body);
 
       res.status(201).json({
         status: "success",
@@ -14,9 +18,9 @@ export class SongController {
     }
   }
 
-  static async findAll(req, res, next) {
+  async findAll(req, res, next) {
     try {
-      const response = await SongService.findAll(req.query);
+      const response = await this.songService.findAllSongs(req.query);
 
       res.status(200).json({
         status: "success",
@@ -27,9 +31,9 @@ export class SongController {
     }
   }
 
-  static async findById(req, res, next) {
+  async findById(req, res, next) {
     try {
-      const response = await SongService.findOne(req.params.id);
+      const response = await this.songService.findSong(req.params.id);
 
       res.status(200).json({
         status: "success",
@@ -40,9 +44,9 @@ export class SongController {
     }
   }
 
-  static async update(req, res, next) {
+  async update(req, res, next) {
     try {
-      await SongService.update(req.params.id, req.body);
+      await this.songService.updateSong(req.params.id, req.body);
 
       res.status(200).json({
         status: "success",
@@ -53,9 +57,9 @@ export class SongController {
     }
   }
 
-  static async delete(req, res, next) {
+  async delete(req, res, next) {
     try {
-      await SongService.delete(req.params.id);
+      await this.songService.deleteSong(req.params.id);
 
       res.status(200).json({
         status: "success",

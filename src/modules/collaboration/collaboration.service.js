@@ -1,8 +1,11 @@
 import { nanoid } from "nanoid";
 import { Pool } from "pg";
-import { Exception } from "../exceptions/error-handler.js";
-import { CollaborationSchema } from "../validations/collaboration.js";
-import { validate } from "../validations/index.js";
+
+import { Exception } from "../../exceptions/error-handler.js";
+
+import { validate } from "../../utils/validation.js";
+
+import { CollaborationSchema } from "./collaboration.schema.js";
 
 export class CollaborationService {
   static pool = new Pool();

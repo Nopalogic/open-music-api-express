@@ -1,9 +1,13 @@
 import { AuthService } from "../services/auth.service.js";
 
 export class AuthController {
-  static async verifyToken(req, res, next) {
+  constructor() {
+    this.authService = new AuthService();
+  }
+
+  async verifyToken(req, res, next) {
     try {
-      const response = await AuthService.verifyToken(req.body);
+      const response = await this.authService.verifyToken(req.body);
 
       res.status(200).json({
         status: "success",
@@ -14,9 +18,9 @@ export class AuthController {
     }
   }
 
-  static async deleteToken(req, res, next) {
+  async deleteToken(req, res, next) {
     try {
-      await AuthService.deleteToken(req.body);
+      await this.authService.deleteToken(req.body);
 
       res.status(200).json({
         status: "success",

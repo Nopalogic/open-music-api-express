@@ -1,14 +1,13 @@
 import { nanoid } from "nanoid";
 import { Pool } from "pg";
 
-import { Exception } from "../exceptions/error-handler.js";
+import { Exception } from "../../exceptions/error-handler.js";
 
-import { validate } from "../validations/index.js";
-import {
-  ActivitySchema,
-  PlaylistActivitySchema,
-} from "../validations/activity.js";
-import { PlaylistService } from "./playlist.service.js";
+import { validate } from "../../utils/validation.js";
+
+import { PlaylistService } from "../playlist/playlist.service.js";
+
+import { ActivitySchema, PlaylistActivitySchema } from "./activity.schema.js";
 
 export class ActivityService {
   static pool = new Pool();

@@ -1,20 +1,24 @@
-import { Pool } from "pg";
-import { Exception } from "../exceptions/error-handler.js";
-import { mapDBtoSongsModel } from "../utils/index.js";
 import { nanoid } from "nanoid";
-import { validate } from "../validations/index.js";
-import { SongsSchema } from "../validations/song.js";
+import { Pool } from "pg";
+
+import { Exception } from "../../exceptions/error-handler.js";
+
+import { mapDBtoSongsModel } from "../../utils/index.js";
+import { validate } from "../../utils/validation.js";
+
+import { SongSchema } from "./song.schema.js";
 
 export class SongService {
-  static pool = new Pool();
-  static tableName = "songs";
+  constructor() {
+    this.pool = new Pool();
+  }
 
-  static async create(request) {
-    const validatedRequest = validate(SongsSchema, request);
+  async createSong(request) {
+    const validatedRequest = validate(SongSchema, request);
 
     const id = nanoid(16);
     const query = {
-      text: `INSERT INTO ${this.tableName} (id, title, year, performer, genre, duration, album_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      text: "INSERT INTO songs (id, title, year, performer, genre, duration, album_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
       values: [
         id,
         validatedRequest.title,
@@ -26,34 +30,34 @@ export class SongService {
       ],
     };
 
-    const { rows } = await this.pool.query(query);
+    const { rowCount, rows } = await this.pool.query(query);
 
-    if (!rows[0].id) {
+    if (!rowCount) {
       throw new Exception(400, "lagu gagal ditambahkan");
     }
 
     return rows[0].id;
   }
 
-  static async findAll({ title, performer }) {
+  async findAllSongs({ title, performer }) {
     let query = "";
     if (title && performer) {
       query = {
-        text: `SELECT id, title, performer FROM ${this.tableName} WHERE LOWER(title) LIKE $1 AND LOWER(performer) LIKE $2`,
+        text: "SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE $1 AND LOWER(performer) LIKE $2",
         values: [`%${title}%`, `%${performer}%`],
       };
     } else if (title) {
       query = {
-        text: `SELECT id, title, performer FROM ${this.tableName} WHERE LOWER(title) LIKE $1`,
+        text: "SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE $1",
         values: [`%${title}%`],
       };
     } else if (performer) {
       query = {
-        text: `SELECT id, title, performer FROM ${this.tableName} WHERE LOWER(performer) LIKE $1`,
+        text: "SELECT id, title, performer FROM songs WHERE LOWER(performer) LIKE $1",
         values: [`%${performer}%`],
       };
     } else {
-      query = `SELECT id, title, performer FROM ${this.tableName}`;
+      query = "SELECT id, title, performer FROM songs";
     }
 
     const { rows } = await this.pool.query(query);
@@ -61,9 +65,9 @@ export class SongService {
     return { songs: rows };
   }
 
-  static async findOne(id) {
+  async findSong(id) {
     const query = {
-      text: `SELECT * FROM ${this.tableName} WHERE id = $1`,
+      text: "SELECT * FROM songs WHERE id = $1",
       values: [id],
     };
 
@@ -76,12 +80,12 @@ export class SongService {
     return { song: mapDBtoSongsModel(rows[0]) };
   }
 
-  static async update(id, request) {
-    const validatedRequest = validate(SongsSchema, request);
+  async updateSong(id, request) {
+    const validatedRequest = validate(SongSchema, request);
 
     const updatedAt = new Date().toISOString();
     const query = {
-      text: `UPDATE ${this.tableName} SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, album_id = $6, updated_at = $7 WHERE id = $8 RETURNING id`,
+      text: "UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, album_id = $6, updated_at = $7 WHERE id = $8 RETURNING id",
       values: [
         validatedRequest.title,
         validatedRequest.year,
@@ -101,9 +105,9 @@ export class SongService {
     }
   }
 
-  static async delete(id) {
+  async deleteSong(id) {
     const query = {
-      text: `DELETE FROM ${this.tableName} WHERE id = $1 RETURNING id`,
+      text: "DELETE FROM songs WHERE id = $1 RETURNING id",
       values: [id],
     };
 

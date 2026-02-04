@@ -2,27 +2,26 @@ import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import { Pool } from "pg";
 
-import { validate } from "../validations/index.js";
-import { LoginSchema, RegisterSchema } from "../validations/user.js";
+import { Exception } from "../../exceptions/error-handler.js";
 
-import { Exception } from "../exceptions/error-handler.js";
+import TokenManager from "../../utils/token-manager.js";
+import { validate } from "../../utils/validation.js";
 
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/token-manager.js";
-
-import { AuthService } from "./auth.service.js";
+import { AuthService } from "../auth/auth.service.js";
+import { LoginSchema, RegisterSchema } from "./user.schema.js";
 
 export class UserService {
-  static pool = new Pool();
+  constructor() {
+    this.pool = new Pool();
+    this.authService = new AuthService();
+  }
 
-  static async register(request) {
-    const validatedRequest = validate(RegisterSchema, request);
+  async register(request) {
+    const { username, password, fullname } = validate(RegisterSchema, request);
 
     const { rowCount: userExist } = await this.pool.query({
       text: "SELECT username from users WHERE username = $1",
-      values: [validatedRequest.username],
+      values: [username],
     });
 
     if (userExist) {
@@ -30,16 +29,11 @@ export class UserService {
     }
 
     const id = nanoid(16);
-    const hashedPassword = await bcrypt.hash(validatedRequest.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const query = {
       text: "INSERT INTO users (id, username, password, fullname) VALUES($1, $2, $3, $4) RETURNING id",
-      values: [
-        id,
-        validatedRequest.username,
-        hashedPassword,
-        validatedRequest.fullname,
-      ],
+      values: [id, username, hashedPassword, fullname],
     };
 
     const { rowCount, rows } = await this.pool.query(query);
@@ -51,12 +45,12 @@ export class UserService {
     return { userId: rows[0].id };
   }
 
-  static async login(request) {
-    const validatedRequest = validate(LoginSchema, request);
+  async login(request) {
+    const { username, password } = validate(LoginSchema, request);
 
     const query = {
       text: "SELECT id, username, password, fullname FROM users WHERE username = $1",
-      values: [validatedRequest.username],
+      values: [username],
     };
 
     const { rowCount, rows } = await this.pool.query(query);
@@ -66,19 +60,16 @@ export class UserService {
     }
 
     const { password: hashedPassword, ...user } = rows[0];
-    const matchedPassword = await bcrypt.compare(
-      validatedRequest.password,
-      hashedPassword,
-    );
+    const matchedPassword = await bcrypt.compare(password, hashedPassword);
 
     if (!matchedPassword) {
       throw new Exception(401, "Invalid username or password");
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = TokenManager.generateAccessToken(user);
+    const refreshToken = TokenManager.generateRefreshToken(user);
 
-    await AuthService.addToken(refreshToken);
+    await this.authService.addToken({ refreshToken });
 
     return { user, accessToken, refreshToken };
   }
