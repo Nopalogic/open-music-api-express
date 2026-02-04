@@ -1,6 +1,6 @@
 import express from "express";
 
-import { ActivityController } from "../controllers/activity.controller.js";
+import { ActivityController } from "./activity.controller.js";
 
 export const activityRouter = express.Router();
 

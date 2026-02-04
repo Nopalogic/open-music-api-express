@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import jwt from "jsonwebtoken";
-import { Exception } from "../exceptions/index.js";
+import { Exception } from "../exceptions/error-handler.js";
 
 const TokenManager = {
   generateAccessToken(payload) {

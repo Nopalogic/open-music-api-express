@@ -13,4 +13,3 @@ const validate = (schema, request) => {
 };
 
 export { validate };
-

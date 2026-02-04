@@ -5,7 +5,7 @@ import { Exception } from "../../exceptions/error-handler.js";
 import TokenManager from "../../utils/token-manager.js";
 import { validate } from "../../utils/validation.js";
 
-import { AuthSchema } from "../../validations/auth.js";
+import { AuthSchema } from "./auth.schema.js";
 
 export class AuthService {
   constructor() {

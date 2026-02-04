@@ -1,6 +1,6 @@
 import express from "express";
 
-import { PlaylistController } from "../controllers/playlist.controller.js";
+import { PlaylistController } from "./playlist.controller.js";
 
 export const playlistRouter = express.Router();
 

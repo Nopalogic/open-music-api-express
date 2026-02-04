@@ -1,4 +1,4 @@
-import { verifyToken } from "../utils/token-manager.js";
+import TokenManager from "../utils/token-manager.js";
 
 export const authMiddleware = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -11,7 +11,9 @@ export const authMiddleware = async (req, res, next) => {
     });
   }
 
-  const { id, username, fullname } = await verifyToken(token);
+  const { id, username, fullname } =
+    await TokenManager.verifyRefreshToken(token);
+
   const user = { id, username, fullname };
 
   if (!user) {

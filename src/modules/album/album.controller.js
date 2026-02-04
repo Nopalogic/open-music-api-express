@@ -1,5 +1,5 @@
 import { Exception } from "../../exceptions/error-handler.js";
-import { AlbumService } from "../services/album.service.js";
+import { AlbumService } from "./album.service.js";
 
 export class AlbumController {
   constructor() {

@@ -1,4 +1,4 @@
-import { SongService } from "../services/song.service.js";
+import { SongService } from "./song.service.js";
 
 export class SongController {
   constructor() {

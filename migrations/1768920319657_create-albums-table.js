@@ -19,6 +19,10 @@ export const up = (pgm) => {
       type: "INT",
       notNull: true,
     },
+    cover: {
+      type: "TEXT",
+      notNull: false,
+    },
     created_at: {
       type: "timestamp",
       notNull: true,

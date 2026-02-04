@@ -55,6 +55,21 @@ export class PlaylistService {
     return { playlists: rows };
   }
 
+  async getPlaylistById(request) {
+    const { playlistId, userId } = validate(PlaylistSchema.get, request);
+
+    await this.verifyPlaylistAccess(playlistId, userId);
+
+    const { rowCount } = await this.pool.query({
+      text: "SELECT id FROM playlists WHERE id = $1",
+      values: [playlistId],
+    });
+
+    if (!rowCount) {
+      throw new Exception(404, "Playlist not found");
+    }
+  }
+
   async addSongToPlaylist(request) {
     const { playlistId, songId, userId } = validate(
       PlaylistSchema.addSong,

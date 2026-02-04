@@ -1,15 +1,19 @@
-import { CollaborationService } from "../services/collaboration.service.js";
-import { PlaylistService } from "../services/playlist.service.js";
+import { CollaborationService } from "./collaboration.service.js";
+import { PlaylistService } from "../playlist/playlist.service.js";
 
 export class CollaborationController {
-  static async addCollabolator(req, res, next) {
+  constructor() {
+    this.collaborationService = new CollaborationService();
+  }
+
+  async addCollabolator(req, res, next) {
     const { playlistId, userId } = req.body;
     const { id: credentials } = req.user;
 
     try {
       await PlaylistService.verifyPlaylistAccess(playlistId, credentials);
 
-      const response = await CollaborationService.addCollabolator({
+      const response = await this.collaborationService.addCollabolator({
         playlistId,
         userId,
       });
@@ -23,12 +27,12 @@ export class CollaborationController {
     }
   }
 
-  static async deleteCollabolator(req, res, next) {
+  async deleteCollabolator(req, res, next) {
     const { playlistId, userId } = req.body;
     const { id: credentials } = req.user;
 
     try {
-      await CollaborationService.deleteCollabolator({
+      await this.collaborationService.deleteCollabolator({
         playlistId,
         userId,
         credentials,

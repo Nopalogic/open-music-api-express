@@ -1,12 +1,19 @@
-import { PlaylistService } from "../services/playlist.service.js";
-import { ActivityService } from "../../services/activity.service.js";
+import { ActivityService } from "../activity/activity.service.js";
+import { PlaylistService } from "./playlist.service.js";
 
 export class PlaylistController {
-  static async create(req, res, next) {
-    req.body.owner = req.user.id;
+  constructor() {
+    this.playlistService = new PlaylistService();
+  }
+  async create(req, res, next) {
+    const { id: owner } = req.user;
 
     try {
-      const response = await PlaylistService.createPlaylist(req.body);
+      const response = await this.playlistService.createPlaylist({
+        ...req.body,
+        owner,
+      });
+
       res.status(201).json({
         status: "success",
         data: response,
@@ -16,11 +23,11 @@ export class PlaylistController {
     }
   }
 
-  static async getAll(req, res, next) {
+  async getAll(req, res, next) {
     const { id: playlistId } = req.params;
 
     try {
-      const response = await PlaylistService.getPlaylists({ playlistId });
+      const response = await this.playlistService.getPlaylists({ playlistId });
 
       res.status(200).json({
         status: "success",
@@ -31,13 +38,18 @@ export class PlaylistController {
     }
   }
 
-  static async addSong(req, res, next) {
-    req.body.playlistId = req.params.id;
-    req.body.userId = req.user.id;
+  async addSong(req, res, next) {
+    const { id: playlistId } = req.params;
+    const { id: userId } = req.user;
 
     try {
-      await PlaylistService.addSongToPlaylist(req.body);
-      await ActivityService.addActivity({ ...req.body, action: "add" });
+      await this.playlistService.addSongToPlaylist(req.body);
+      await ActivityService.addActivity({
+        playlistId,
+        userId,
+        ...req.body,
+        action: "add",
+      });
 
       res.status(201).json({
         status: "success",
@@ -48,9 +60,9 @@ export class PlaylistController {
     }
   }
 
-  static async getSongs(req, res, next) {
+  async getSongs(req, res, next) {
     try {
-      const response = await PlaylistService.getSongByIdPlaylist(
+      const response = await this.playlistService.getSongByIdPlaylist(
         req.params.id,
         req.user.id,
       );
@@ -64,13 +76,18 @@ export class PlaylistController {
     }
   }
 
-  static async removeSongs(req, res, next) {
-    req.body.playlistId = req.params.id;
-    req.body.userId = req.user.id;
+  async removeSongs(req, res, next) {
+    const { id: playlistId } = req.params;
+    const { id: userId } = req.user;
 
     try {
-      await PlaylistService.deleteSongByIdPlaylist(req.body);
-      await ActivityService.addActivity({ ...req.body, action: "delete" });
+      await this.playlistService.deleteSongByIdPlaylist(req.body);
+      await ActivityService.addActivity({
+        playlistId,
+        userId,
+        ...req.body,
+        action: "delete",
+      });
 
       res.status(200).json({
         status: "success",
@@ -81,12 +98,12 @@ export class PlaylistController {
     }
   }
 
-  static async delete(req, res, next) {
+  async delete(req, res, next) {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
 
     try {
-      await PlaylistService.deletePlaylist({
+      await this.playlistService.deletePlaylist({
         playlistId,
         userId,
       });

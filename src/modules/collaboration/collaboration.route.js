@@ -1,6 +1,6 @@
 import express from "express";
 
-import { CollaborationController } from "../controllers/collaboration.controller.js";
+import { CollaborationController } from "./collaboration.controller.js";
 
 export const collaborationRouter = express.Router();
 

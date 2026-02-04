@@ -8,7 +8,7 @@ import TokenManager from "../../utils/token-manager.js";
 import { validate } from "../../utils/validation.js";
 
 import { AuthService } from "../auth/auth.service.js";
-import { LoginSchema, RegisterSchema } from "./user.schema.js";
+import { GetUserSchema, LoginSchema, RegisterSchema } from "./user.schema.js";
 
 export class UserService {
   constructor() {
@@ -72,5 +72,20 @@ export class UserService {
     await this.authService.addToken({ refreshToken });
 
     return { user, accessToken, refreshToken };
+  }
+
+  async getUserById(request) {
+    const { userId } = validate(GetUserSchema, request);
+
+    const query = {
+      text: "SELECT id FROM users WHERE id = $1",
+      values: [userId],
+    };
+
+    const { rowCount } = await this.pool.query(query);
+
+    if (!rowCount) {
+      throw new Exception(404, "User not found");
+    }
   }
 }
