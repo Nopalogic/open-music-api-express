@@ -25,7 +25,7 @@ export const upload = multer({
   limits: { fileSize: 512000 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype && file.mimetype.startsWith("image/")) cb(null, true);
-    else cb(new Exception(413, "Allowed image file only"), false);
+    else cb(new Exception(400, "Allowed image file only"), false);
   },
 });
 
