@@ -8,13 +8,13 @@ export const albumLikeRouter = express.Router();
 const albumLikeController = new AlbumLikeController();
 
 albumLikeRouter.post(
-  "/:albumId/likes",
+  "/albums/:id/likes",
   authMiddleware,
   albumLikeController.addLike,
 );
 albumLikeRouter.delete(
-  "/:albumId/likes",
+  "/albums/:id/likes",
   authMiddleware,
   albumLikeController.deleteLike,
 );
-albumLikeRouter.get("/:albumId/likes", albumLikeController.getCountLikes);
+albumLikeRouter.get("/albums/:id/likes", albumLikeController.getCountLikes);

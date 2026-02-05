@@ -10,7 +10,8 @@ export class ExportController {
     this.exportService = new ExportService();
     this.playlistService = new PlaylistService();
   }
-  async exportSongs(req, res, next) {
+
+  exportSongs = async (req, res, next) => {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
     const { targetEmail } = validate(ExportPayloadSchema, req.body);
@@ -35,5 +36,5 @@ export class ExportController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

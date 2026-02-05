@@ -5,7 +5,7 @@ export class ActivityController {
     this.activityService = new ActivityService();
   }
 
-  async addActivity(req, res, next) {
+  addActivity = async (req, res, next) => {
     req.body.playlistId = req.params.id;
     req.body.userId = req.user.id;
 
@@ -19,9 +19,9 @@ export class ActivityController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getPlaylistByIdWithActivity(req, res, next) {
+  getPlaylistByIdWithActivity = async (req, res, next) => {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
     try {
@@ -37,5 +37,5 @@ export class ActivityController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

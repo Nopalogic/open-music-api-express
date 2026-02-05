@@ -25,6 +25,8 @@ app.use(albumRouter);
 app.use(songRouter);
 app.use(albumLikeRouter);
 
+app.use("/uploads", express.static("src/modules/album/files/images"));
+
 app.use(authMiddleware, playlistRouter);
 app.use(authMiddleware, activityRouter);
 app.use(authMiddleware, collaborationRouter);

@@ -60,6 +60,7 @@ export class AlbumService {
       id: albumData.id,
       name: albumData.name,
       year: albumData.year,
+      coverUrl: albumData.cover,
       songs,
     };
 

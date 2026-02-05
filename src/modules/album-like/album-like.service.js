@@ -18,6 +18,8 @@ export class AlbumLikeService {
   async addLike(request) {
     const { userId, albumId } = validate(AlbumLikeSchema, request);
 
+    await this.isAlbumLikedByUser({ userId, albumId });
+
     const id = nanoid(16);
     const query = {
       text: "INSERT INTO user_album_likes (id, user_id, album_id) VALUES ($1, $2, $3) RETURNING id",
@@ -77,9 +79,7 @@ export class AlbumLikeService {
     }
   }
 
-  async isAlbumLikedByUser(request) {
-    const { userId, albumId } = validate(AlbumLikeSchema, request);
-
+  async isAlbumLikedByUser({ userId, albumId }) {
     const query = {
       text: "SELECT 1 FROM user_album_likes WHERE user_id = $1 AND album_id = $2",
       values: [userId, albumId],
@@ -87,7 +87,7 @@ export class AlbumLikeService {
 
     const { rowCount } = await this.pool.query(query);
 
-    if (!rowCount) {
+    if (rowCount) {
       throw new Exception(
         400,
         "Gagal menambahkan like. Album sudah pernah di-like oleh user ini",

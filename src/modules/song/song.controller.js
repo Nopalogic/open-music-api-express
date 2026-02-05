@@ -5,7 +5,7 @@ export class SongController {
     this.songService = new SongService();
   }
 
-  async create(req, res, next) {
+  create = async (req, res, next) => {
     try {
       const response = await this.songService.createSong(req.body);
 
@@ -16,9 +16,9 @@ export class SongController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async findAll(req, res, next) {
+  findAll = async (req, res, next) => {
     try {
       const response = await this.songService.findAllSongs(req.query);
 
@@ -29,9 +29,9 @@ export class SongController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async findById(req, res, next) {
+  findById = async (req, res, next) => {
     try {
       const response = await this.songService.findSong(req.params.id);
 
@@ -42,9 +42,9 @@ export class SongController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async update(req, res, next) {
+  update = async (req, res, next) => {
     try {
       await this.songService.updateSong(req.params.id, req.body);
 
@@ -55,9 +55,9 @@ export class SongController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async delete(req, res, next) {
+  delete = async (req, res, next) => {
     try {
       await this.songService.deleteSong(req.params.id);
 
@@ -68,5 +68,5 @@ export class SongController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

@@ -9,7 +9,7 @@ export class AlbumLikeController {
     this.userService = new UserService();
   }
 
-  async addLike(req, res, next) {
+  addLike = async (req, res, next) => {
     const { id: albumId } = req.params;
     const { id: userId } = req.user;
 
@@ -18,12 +18,8 @@ export class AlbumLikeController {
 
       await this.albumService.findAlbum(albumId);
 
-      await this.albumLikeService.isAlbumLikedByUser({
-        userId,
-        albumId,
-      });
+      await this.albumLikeService.addLike({ userId, albumId });
 
-      await this.albumLikeService.addLike(userId, albumId);
       res.status(201).json({
         status: "success",
         message: "Like berhasil ditambahkan",
@@ -31,14 +27,14 @@ export class AlbumLikeController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async deleteLike(req, res, next) {
-    const { albumId } = req.params;
-    const { userId } = req.user;
+  deleteLike = async (req, res, next) => {
+    const { id: albumId } = req.params;
+    const { id: userId } = req.user;
 
     try {
-      await this.albumService.getAlbumById(albumId);
+      await this.albumService.findAlbum(albumId);
 
       await this.albumLikeService.removeLike({ userId, albumId });
 
@@ -49,12 +45,12 @@ export class AlbumLikeController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getCountLikes(req, res, next) {
-    const { albumId } = req.params;
+  getCountLikes = async (req, res, next) => {
+    const { id: albumId } = req.params;
     try {
-      await this.albumService.getAlbumById(albumId);
+      await this.albumService.findAlbum(albumId);
 
       const { count: likeCount, source } =
         await this.albumLikeService.getCountLikes(albumId);
@@ -73,5 +69,5 @@ export class AlbumLikeController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

@@ -6,7 +6,7 @@ export class CollaborationController {
     this.collaborationService = new CollaborationService();
   }
 
-  async addCollabolator(req, res, next) {
+  addCollabolator = async (req, res, next) => {
     const { playlistId, userId } = req.body;
     const { id: credentials } = req.user;
 
@@ -25,9 +25,9 @@ export class CollaborationController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async deleteCollabolator(req, res, next) {
+  deleteCollabolator = async (req, res, next) => {
     const { playlistId, userId } = req.body;
     const { id: credentials } = req.user;
 
@@ -45,5 +45,5 @@ export class CollaborationController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

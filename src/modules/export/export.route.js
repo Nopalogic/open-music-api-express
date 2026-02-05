@@ -6,4 +6,4 @@ export const exportRouter = express.Router();
 
 const exportController = new ExportController();
 
-exportRouter.post("/playlists/:playlistId", exportController.exportSongs);
+exportRouter.post("/export/playlists/:id", exportController.exportSongs);

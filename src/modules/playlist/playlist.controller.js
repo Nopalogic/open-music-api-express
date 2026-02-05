@@ -5,7 +5,8 @@ export class PlaylistController {
   constructor() {
     this.playlistService = new PlaylistService();
   }
-  async create(req, res, next) {
+
+  create = async (req, res, next) => {
     const { id: owner } = req.user;
 
     try {
@@ -21,9 +22,9 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getAll(req, res, next) {
+  getAll = async (req, res, next) => {
     const { id: playlistId } = req.params;
 
     try {
@@ -36,9 +37,9 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async addSong(req, res, next) {
+  addSong = async (req, res, next) => {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
 
@@ -58,9 +59,9 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getSongs(req, res, next) {
+  getSongs = async (req, res, next) => {
     try {
       const response = await this.playlistService.getSongByIdPlaylist(
         req.params.id,
@@ -74,9 +75,9 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async removeSongs(req, res, next) {
+  removeSongs = async (req, res, next) => {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
 
@@ -96,9 +97,9 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async delete(req, res, next) {
+  delete = async (req, res, next) => {
     const { id: playlistId } = req.params;
     const { id: userId } = req.user;
 
@@ -115,5 +116,5 @@ export class PlaylistController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

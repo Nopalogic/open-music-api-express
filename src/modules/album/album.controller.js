@@ -6,7 +6,7 @@ export class AlbumController {
     this.albumService = new AlbumService();
   }
 
-  async create(req, res, next) {
+  create = async (req, res, next) => {
     try {
       const response = await this.albumService.createAlbum(req.body);
 
@@ -17,9 +17,9 @@ export class AlbumController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async findById(req, res, next) {
+  findById = async (req, res, next) => {
     try {
       const response = await this.albumService.findAlbum(req.params.id);
 
@@ -30,9 +30,9 @@ export class AlbumController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async update(req, res, next) {
+  update = async (req, res, next) => {
     try {
       await this.albumService.updateAlbum(req.params.id, req.body);
 
@@ -43,9 +43,9 @@ export class AlbumController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async delete(req, res, next) {
+  delete = async (req, res, next) => {
     try {
       await this.albumService.deleteAlbum(req.params.id);
 
@@ -56,9 +56,9 @@ export class AlbumController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async uploadCover(req, res, next) {
+  uploadCover = async (req, res, next) => {
     try {
       const { id } = req.params;
 
@@ -84,5 +84,5 @@ export class AlbumController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

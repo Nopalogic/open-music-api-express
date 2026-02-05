@@ -5,7 +5,7 @@ export class UserController {
     this.userService = new UserService();
   }
 
-  async register(req, res, next) {
+  register = async (req, res, next) => {
     try {
       const response = await this.userService.register(req.body);
 
@@ -16,9 +16,9 @@ export class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async login(req, res, next) {
+  login = async (req, res, next) => {
     try {
       const response = await this.userService.login(req.body);
 
@@ -29,5 +29,5 @@ export class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

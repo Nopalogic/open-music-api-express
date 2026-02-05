@@ -206,34 +206,26 @@ export class PlaylistService {
   }
 
   async verifyPlaylistAccess(playlistId, userId) {
-    try {
-      const { rows: playlist } = await this.pool.query({
-        text: "SELECT owner FROM playlists WHERE id = $1",
-        values: [playlistId],
-      });
+    const { rowCount, rows: playlist } = await this.pool.query({
+      text: "SELECT owner FROM playlists WHERE id = $1",
+      values: [playlistId],
+    });
 
-      if (playlist[0].owner !== userId) {
-        throw new Exception(
-          403,
-          "You don't have permission to access this playlist",
-        );
-      }
-    } catch (error) {
-      if (error.status === 403) {
-        const { rowCount: playlistCollab } = await this.pool.query({
-          text: "SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2",
-          values: [playlistId, userId],
-        });
-
-        if (!playlistCollab) {
-          throw new Exception(
-            403,
-            "You don't have permission to access this playlist",
-          );
-        }
-      } else {
-        throw error;
-      }
+    if (!rowCount) {
+      throw new Exception(404, "Playlist not found");
     }
+    if (playlist[0].owner === userId) return true;
+
+    const { rowCount: playlistCollab } = await this.pool.query({
+      text: "SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2",
+      values: [playlistId, userId],
+    });
+
+    if (playlistCollab) return true;
+
+    throw new Exception(
+      403,
+      "You don't have permission to access this playlist",
+    );
   }
 }

@@ -12,7 +12,7 @@ export const authMiddleware = async (req, res, next) => {
   }
 
   const { id, username, fullname } =
-    await TokenManager.verifyRefreshToken(token);
+    await TokenManager.verifyAccessToken(token);
 
   const user = { id, username, fullname };
 
