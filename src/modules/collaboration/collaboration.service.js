@@ -8,9 +8,11 @@ import { validate } from "../../utils/validation.js";
 import { CollaborationSchema } from "./collaboration.schema.js";
 
 export class CollaborationService {
-  static pool = new Pool();
+  constructor() {
+    this.pool = new Pool();
+  }
 
-  static async addCollabolator(request) {
+  async addCollabolator(request) {
     const { playlistId, userId } = validate(CollaborationSchema, request);
 
     const { rowCount: userExist } = await this.pool.query({
@@ -41,7 +43,7 @@ export class CollaborationService {
     return { collaborationId: rows[0].id };
   }
 
-  static async verifyCollab(userId, playlistId) {
+  async verifyCollab(userId, playlistId) {
     const query = {
       text: "SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id = $2",
       values: [playlistId, userId],
@@ -54,7 +56,7 @@ export class CollaborationService {
     }
   }
 
-  static async deleteCollabolator({ credentials, ...request }) {
+  async deleteCollabolator({ credentials, ...request }) {
     const { playlistId, userId } = validate(CollaborationSchema, request);
 
     const { rowCount: playlistExist, rows: playlist } = await this.pool.query({

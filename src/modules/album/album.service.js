@@ -67,7 +67,7 @@ export class AlbumService {
     return mapDBtoAlbumModel(resultAlbum);
   }
 
-  async updateAlbum({ id, ...request }) {
+  async updateAlbum(id, request) {
     const { name, year } = validate(AlbumSchema, request);
 
     const updatedAt = new Date().toISOString();

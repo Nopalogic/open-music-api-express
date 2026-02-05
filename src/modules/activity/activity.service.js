@@ -10,9 +10,12 @@ import { PlaylistService } from "../playlist/playlist.service.js";
 import { ActivitySchema, PlaylistActivitySchema } from "./activity.schema.js";
 
 export class ActivityService {
-  static pool = new Pool();
+  constructor() {
+    this.pool = new Pool();
+    this.playlistService = new PlaylistService();
+  }
 
-  static async addActivity(request) {
+  async addActivity(request) {
     const { playlistId, songId, userId, action } = validate(
       ActivitySchema,
       request,
@@ -33,10 +36,10 @@ export class ActivityService {
     }
   }
 
-  static async getPlaylistByIdWithActivity(request) {
+  async getPlaylistByIdWithActivity(request) {
     const { playlistId, userId } = validate(PlaylistActivitySchema, request);
 
-    await PlaylistService.verifyPlaylistAccess(playlistId, userId);
+    await this.playlistService.verifyPlaylistAccess(playlistId, userId);
 
     const query = {
       text: `

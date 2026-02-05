@@ -4,6 +4,7 @@ import { PlaylistService } from "../playlist/playlist.service.js";
 export class CollaborationController {
   constructor() {
     this.collaborationService = new CollaborationService();
+    this.playlistService = new PlaylistService();
   }
 
   addCollabolator = async (req, res, next) => {
@@ -11,7 +12,7 @@ export class CollaborationController {
     const { id: credentials } = req.user;
 
     try {
-      await PlaylistService.verifyPlaylistAccess(playlistId, credentials);
+      await this.playlistService.verifyPlaylistAccess(playlistId, credentials);
 
       const response = await this.collaborationService.addCollabolator({
         playlistId,

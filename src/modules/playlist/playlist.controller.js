@@ -4,6 +4,7 @@ import { PlaylistService } from "./playlist.service.js";
 export class PlaylistController {
   constructor() {
     this.playlistService = new PlaylistService();
+    this.activityService = new ActivityService();
   }
 
   create = async (req, res, next) => {
@@ -25,7 +26,7 @@ export class PlaylistController {
   };
 
   getAll = async (req, res, next) => {
-    const { id: playlistId } = req.params;
+    const { id: playlistId } = req.user;
 
     try {
       const response = await this.playlistService.getPlaylists({ playlistId });
@@ -44,8 +45,12 @@ export class PlaylistController {
     const { id: userId } = req.user;
 
     try {
-      await this.playlistService.addSongToPlaylist(req.body);
-      await ActivityService.addActivity({
+      await this.playlistService.addSongToPlaylist({
+        playlistId,
+        userId,
+        ...req.body,
+      });
+      await this.activityService.addActivity({
         playlistId,
         userId,
         ...req.body,
@@ -82,8 +87,12 @@ export class PlaylistController {
     const { id: userId } = req.user;
 
     try {
-      await this.playlistService.deleteSongByIdPlaylist(req.body);
-      await ActivityService.addActivity({
+      await this.playlistService.deleteSongByIdPlaylist({
+        playlistId,
+        userId,
+        ...req.body,
+      });
+      await this.activityService.addActivity({
         playlistId,
         userId,
         ...req.body,
